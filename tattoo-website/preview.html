@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Tattoo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Preview</h1>
+    <div id="modelContainer">
+        <div id="model"></div>
+        <div id="tattooText"></div>
+    </div>
+    <label>Font Size: <input type="range" id="sizeRange" min="20" max="100" value="40"></label>
+    <label>Font Family:
+        <select id="fontSelect">
+            <option value="serif">Serif</option>
+            <option value="sans-serif">Sans Serif</option>
+            <option value="cursive">Cursive</option>
+        </select>
+    </label>
+    <script src="data.js"></script>
+    <script src="preview.js"></script>
+</body>
+</html>

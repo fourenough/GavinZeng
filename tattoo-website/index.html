@@ -1,19 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinese Tattoo Selector</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<title>Tattoo Preview</title>
+<style>
+    body { font-family: Arial, sans-serif; }
+    #viewer { position: relative; width: 200px; height: 300px; margin: 20px auto; }
+    .orientation { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
+    .orientation.active { display: block; }
+    svg { width: 100%; height: 100%; }
+    .tattoo { position: absolute; width: 20px; height: 20px; pointer-events: none; }
+</style>
 </head>
 <body>
-    <h1>Chinese Character Tattoo</h1>
-    <p>Select a Chinese phrase to preview:</p>
-    <select id="phraseSelect"></select>
-    <p id="translation"></p>
-    <button id="continueBtn">Continue</button>
-
-    <script src="data.js"></script>
-    <script src="select.js"></script>
+<h2>Body Tattoo Preview</h2>
+<div id="viewer">
+    <svg id="front" class="orientation" viewBox="0 0 150 220">
+        <circle cx="75" cy="20" r="15" fill="#fcd7b6" />
+        <rect x="55" y="35" width="40" height="60" fill="#fcd7b6" />
+        <rect x="25" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="105" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="55" y="95" width="20" height="80" fill="#fcd7b6" />
+        <rect x="75" y="95" width="20" height="80" fill="#fcd7b6" />
+    </svg>
+    <svg id="left" class="orientation" viewBox="0 0 150 220">
+        <circle cx="75" cy="20" r="15" fill="#fcd7b6" />
+        <rect x="55" y="35" width="40" height="60" fill="#fcd7b6" />
+        <rect x="35" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="55" y="95" width="20" height="80" fill="#fcd7b6" />
+    </svg>
+    <svg id="back" class="orientation" viewBox="0 0 150 220">
+        <circle cx="75" cy="20" r="15" fill="#fcd7b6" />
+        <rect x="55" y="35" width="40" height="60" fill="#fcd7b6" />
+        <rect x="25" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="105" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="55" y="95" width="20" height="80" fill="#fcd7b6" />
+        <rect x="75" y="95" width="20" height="80" fill="#fcd7b6" />
+    </svg>
+    <svg id="right" class="orientation" viewBox="0 0 150 220">
+        <circle cx="75" cy="20" r="15" fill="#fcd7b6" />
+        <rect x="55" y="35" width="40" height="60" fill="#fcd7b6" />
+        <rect x="95" y="40" width="20" height="70" fill="#fcd7b6" />
+        <rect x="75" y="95" width="20" height="80" fill="#fcd7b6" />
+    </svg>
+</div>
+<div style="text-align:center;">
+    <button onclick="rotate(-1)">&lt;</button>
+    Orientation: <span id="orientation-name">front</span>
+    <button onclick="rotate(1)">&gt;</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+    <label>Body part:
+        <select id="body-part">
+            <option value="chest">Chest/Back</option>
+            <option value="left-arm">Left Arm</option>
+            <option value="right-arm">Right Arm</option>
+            <option value="left-leg">Left Leg</option>
+            <option value="right-leg">Right Leg</option>
+        </select>
+    </label>
+    <button onclick="placeTattoo()">Place Tattoo</button>
+</div>
+<script>
+const orientations = ['front','left','back','right'];
+let currentOrientation = 0;
+const tattoos = {}; // store part -> element
+const positions = {
+    front:{
+        'chest': {x:70, y:60},
+        'left-arm': {x:35, y:60},
+        'right-arm': {x:115, y:60},
+        'left-leg': {x:65, y:150},
+        'right-leg': {x:85, y:150}
+    },
+    left:{
+        'chest': {x:80, y:60},
+        'left-arm': {x:45, y:60},
+        'left-leg': {x:75, y:150}
+    },
+    back:{
+        'chest': {x:70, y:60},
+        'left-arm': {x:35, y:60},
+        'right-arm': {x:115, y:60},
+        'left-leg': {x:65, y:150},
+        'right-leg': {x:85, y:150}
+    },
+    right:{
+        'chest': {x:80, y:60},
+        'right-arm': {x:105, y:60},
+        'right-leg': {x:75, y:150}
+    }
+};
+function showOrientation() {
+    orientations.forEach((o,i)=>{
+        document.getElementById(o).classList.toggle('active', i===currentOrientation);
+    });
+    document.getElementById('orientation-name').textContent = orientations[currentOrientation];
+    for(const part in tattoos){
+        const pos = positions[orientations[currentOrientation]][part];
+        if(pos){
+            tattoos[part].style.left = pos.x + 'px';
+            tattoos[part].style.top = pos.y + 'px';
+            tattoos[part].style.display = 'block';
+        }else{
+            tattoos[part].style.display = 'none';
+        }
+    }
+}
+function rotate(dir){
+    currentOrientation = (currentOrientation + dir + orientations.length)%orientations.length;
+    showOrientation();
+}
+function placeTattoo(){
+    const part = document.getElementById('body-part').value;
+    let el = tattoos[part];
+    if(!el){
+        el = document.createElement('div');
+        el.className = 'tattoo';
+        el.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20"><line x1="10" y1="0" x2="10" y2="20" stroke="red" stroke-width="2"/><line x1="0" y1="10" x2="20" y2="10" stroke="red" stroke-width="2"/></svg>';
+        document.getElementById('viewer').appendChild(el);
+        tattoos[part] = el;
+    }
+    showOrientation();
+}
+// initialize
+showOrientation();
+</script>
 </body>
 </html>
